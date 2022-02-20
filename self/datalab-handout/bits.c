@@ -287,12 +287,12 @@ int howManyBits(int x) {
  */
 unsigned floatScale2(unsigned uf) {
   unsigned s = uf >> 31;
-	unsigned e = (uf << 1) >> 24;
-	unsigned frac = (uf << 9) >> 9;
-	if(e == 0xff) return uf;
-	else if(!e) return ((s << 31) | (frac << 1));
-	else if(e == 0xfe) return ((s << 31) | 0x7f800000);
-	else return ((s << 31) | ((e + 1) << 23) | frac);
+  unsigned e = (uf << 1) >> 24;
+  unsigned frac = (uf << 9) >> 9;
+  if(e == 0xff) return uf;
+  else if(!e) return ((s << 31) | (frac << 1));
+  else if(e == 0xfe) return ((s << 31) | 0x7f800000);
+  else return ((s << 31) | ((e + 1) << 23) | frac);
 }
 /* 
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
@@ -307,7 +307,22 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-  return 2;
+  int s = uf >> 31;
+  int M = ((uf << 1) >> 24) - 127; //denormalized values rounded to 0
+  int f = ((uf << 9) >> 9) + 0x800000; //denormalized values rounded to 0
+  int round = 1;
+  if(M >= 31) round = 0x80000000u;
+  else if(M < -1) round = 0;
+  else if(M >= 23) round = f << (M - 23);
+  else{
+    int roundDown = f >> (23 - M); //f = 1....................... (24 bits), (23 - M) bits to the right of the binary point
+    //int firstHalf = (f >> (22 - M)) - (roundDown << 1); //first number to the right of the binary point
+    //if(firstHalf == 0) round = roundDown; //if first half is 0, round down.
+    //else if((f << (10 + M)) == 0) round = (roundDown % 2 ? roundDown + 1 : roundDown); //if integer + 1/2, round to even.
+    //else round = roundDown + 1; //else round up.
+    round = roundDown;
+  }
+  return (s ? -round : round);
 }
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x

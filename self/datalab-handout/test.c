@@ -20,8 +20,7 @@ int main(int argc, char *argv[]){
 	int minusi = ~i + 1;
   int sign = i >> 31;
 	int j = ~i + ~i;
-  int k = isTmax(2147483647);
-	float f = 3510593;
-	read_byte((byte_pointer) &f, sizeof(float));
+  int k = 0xffffffffu >> 31;
+	read_byte((byte_pointer) &k, sizeof(int));
 	return 0;
 }
