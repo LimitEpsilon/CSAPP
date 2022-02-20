@@ -338,5 +338,8 @@ int floatFloat2Int(unsigned uf) {
  *   Rating: 4
  */
 unsigned floatPower2(int x) {
-    return 2;
+  if(x < -149) return 0;
+  else if(x > 127) return 0x7f800000u;
+  else if(x < -126) return 1 << (149 + x); // 1/2^(23-shift) * 1/2^126 = 1/2^(-x), so the shift amount is 149 + x
+  else return (x + 127) << 23; // e = Bias + x = 127 + x when denormalized
 }
