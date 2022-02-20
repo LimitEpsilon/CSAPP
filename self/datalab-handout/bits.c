@@ -1,4 +1,4 @@
-/* 
+/*
  * CS:APP Data Lab 
  * 
  * <Please put your name and userid here>
@@ -286,7 +286,13 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned floatScale2(unsigned uf) {
-  return 2;
+  unsigned s = uf >> 31;
+	unsigned e = (uf << 1) >> 24;
+	unsigned frac = (uf << 9) >> 9;
+	if(e == 0xff) return uf;
+	else if(!e) return ((s << 31) | (frac << 1));
+	else if(e == 0xfe) return ((s << 31) | 0x7f800000);
+	else return ((s << 31) | ((e + 1) << 23) | frac);
 }
 /* 
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
